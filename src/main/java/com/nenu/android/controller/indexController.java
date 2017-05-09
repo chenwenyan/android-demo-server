@@ -24,7 +24,7 @@ public class indexController {
     @Autowired
     private IndexService indexService;
 
-    @RequestMapping(value = "/test",method = RequestMethod.POST)
+    @RequestMapping(value = "test",method = RequestMethod.GET)
     @ResponseBody
     public JSONObject test(HttpServletRequest request, HttpServletResponse response,
                            Model model){
