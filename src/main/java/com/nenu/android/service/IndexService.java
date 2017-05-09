@@ -10,4 +10,6 @@ public interface IndexService {
 
     public String test(String test)throws Exception;
 
+    public String PFPGrowth(String test)throws Exception;
+
 }

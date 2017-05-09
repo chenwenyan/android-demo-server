@@ -43,6 +43,28 @@ public class indexController {
             e.printStackTrace();
         }
         return jsonObject;
+    }
 
+    @RequestMapping(value = "pfpGrowth",method = RequestMethod.GET)
+    @ResponseBody
+    public JSONObject pfpGrowth(HttpServletRequest request, HttpServletResponse response,
+                           Model model){
+        JSONObject jsonObject = new JSONObject();
+        String test = request.getParameter("test") == null ? "null" : request.getParameter("test");
+        System.out.println(test);
+        try{
+            String result = indexService.PFPGrowth(test);
+            jsonObject.put("code",1);
+            jsonObject.put("msg","success");
+            jsonObject.put("param",test);
+            jsonObject.put("data",result);
+
+        }catch (Exception e){
+            jsonObject.put("code",0);
+            jsonObject.put("msg","failed");
+            jsonObject.put("param",test);
+            e.printStackTrace();
+        }
+        return jsonObject;
     }
 }
