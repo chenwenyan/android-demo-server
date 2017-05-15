@@ -36,12 +36,19 @@ public class IndexServiceImpl implements IndexService {
     }
 
     public String PFPGrowth(String test)throws Exception{
+
+//        System.setProperty("hadoop.home.dir", "D:\\software\\hadoop-2.7.3");
+
         //获取开始时间
         long startTime = System.currentTimeMillis();
 
         Set<String> features = new HashSet<String>();//集合，只存储不重复的项
         String input = "D://T10I4D100K.txt";//测试数据集
+//      网址：  http://fimi.ua.ac.be/data/T10I4D100K.dat
+
 //        String input = "D://T40I10D100K.txt";//测试数据集
+//      网址：  http://fimi.ua.ac.be/data/T40I10D100K.dat
+
         int minSupport = 100;//支持度阈值
         int maxHeapSize = 50;//top-k  大根堆的大小
         String pattern = " \"[ ,\\t]*[,|\\t][ ,\\t]*\" ";//do not know why
