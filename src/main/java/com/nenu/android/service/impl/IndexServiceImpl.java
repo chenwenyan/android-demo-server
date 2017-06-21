@@ -17,6 +17,7 @@ import org.apache.mahout.fpm.pfpgrowth.fpgrowth.FPGrowth;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.List;
@@ -31,11 +32,11 @@ import java.util.Set;
 @Service("indexService")
 public class IndexServiceImpl implements IndexService {
 
-    public String test(String test)throws Exception{
+    public String test(String test) throws Exception {
         return test;
     }
 
-    public String PFPGrowth(String test)throws Exception{
+    public String PFPGrowth(String test) throws Exception {
 
 //        System.setProperty("hadoop.home.dir", "D:\\software\\hadoop-2.7.3");
 
@@ -79,15 +80,35 @@ public class IndexServiceImpl implements IndexService {
             System.out.println(entry.getFirst());
             System.out.println(entry.getSecond());
         }
-        System.out.println("\n end......");
-
         //获取结束时间
         long endTime = System.currentTimeMillis();
         long costTime = endTime - startTime;
-        System.out.println("程序运行时间:"+ costTime + "ms");
+        System.out.println("PFPGrowth程序运行时间:" + costTime + "ms");
 
         return String.valueOf(costTime);
+    }
 
+    public String computeGoldenPoint(int n) throws Exception {
+        try {
+//            double pi=0;
+//            double dx=1e-3;
+//            for(double x=-100;x<=+100;x+=dx){
+//                pi+=Math.exp(-x*x)*dx;
+//            }
+            BigDecimal a = new BigDecimal(0.618);
+            BigDecimal b = new BigDecimal("1");
+
+            for (int i = 1; i < n + 1; i++) {
+                //这个循环实现  1/(1/...+1)  本题主要是考察BigDecimal的用法..
+                a = b.divide(a.add(b), n, BigDecimal.ROUND_HALF_UP);
+            }
+
+            System.out.println("计算黄金分割点：");
+            System.out.println(a.toString());
+            return a.toString();
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
     }
 
 }

@@ -30,7 +30,7 @@ public class indexController {
                            Model model){
         JSONObject jsonObject = new JSONObject();
         String test = request.getParameter("test");
-        System.out.println(test);
+        System.out.println("参数："+test);
         try{
             String result = indexService.test(test);
             jsonObject.put("code",1);
@@ -51,7 +51,7 @@ public class indexController {
                            Model model){
         JSONObject jsonObject = new JSONObject();
         String test = request.getParameter("test") == null ? "null" : request.getParameter("test");
-        System.out.println(test);
+        System.out.println("参数："+test);
         try{
             String result = indexService.PFPGrowth(test);
             jsonObject.put("code",1);
@@ -63,6 +63,27 @@ public class indexController {
             jsonObject.put("code",0);
             jsonObject.put("msg","failed");
             jsonObject.put("param",test);
+            e.printStackTrace();
+        }
+        return jsonObject;
+    }
+
+    @RequestMapping(value = "computeGoldenPoint",method = RequestMethod.GET)
+    @ResponseBody
+    public JSONObject computeGoldenPoint(HttpServletRequest request, HttpServletResponse response,
+                           Model model){
+        JSONObject jsonObject = new JSONObject();
+        String test = request.getParameter("test");
+        System.out.println("参数："+test);
+        try{
+            String result = indexService.computeGoldenPoint(Integer.parseInt(test));
+            jsonObject.put("code",1);
+            jsonObject.put("msg","success");
+            jsonObject.put("data",result);
+
+        }catch (Exception e){
+            jsonObject.put("code",0);
+            jsonObject.put("msg","failed");
             e.printStackTrace();
         }
         return jsonObject;

@@ -12,4 +12,6 @@ public interface IndexService {
 
     public String PFPGrowth(String test)throws Exception;
 
+    public String computeGoldenPoint(int n) throws Exception;
+
 }
