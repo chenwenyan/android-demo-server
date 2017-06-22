@@ -10,6 +10,8 @@ import java.util.List;
  */
 public interface AbstractMachineService {
 
-    public List<String> analylis(String expression) throws Exception;
+    public List<String> start(String expression) throws Exception;
+
+    public List<String> next(String expression) throws Exception;
 
 }

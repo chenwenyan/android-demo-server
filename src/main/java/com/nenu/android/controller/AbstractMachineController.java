@@ -27,7 +27,7 @@ public class AbstractMachineController {
         return "abstractMachine";
     }
 
-    @RequestMapping(value = "/getExpression", method = RequestMethod.POST)
+    @RequestMapping(value = "/start", method = RequestMethod.POST)
     @ResponseBody
     public JSONObject transExpression(HttpServletRequest request, HttpServletResponse response,
                                       Model model) {
@@ -43,7 +43,7 @@ public class AbstractMachineController {
         return json;
     }
 
-    @RequestMapping(value = "/compute", method = RequestMethod.POST)
+    @RequestMapping(value = "/next", method = RequestMethod.POST)
     @ResponseBody
     public JSONObject comExpression(HttpServletRequest request, HttpServletResponse response,
                                                 Model model) {
@@ -122,15 +122,6 @@ public class AbstractMachineController {
             return false;
     }
 
-    private void analylis(String expression) throws Exception {
-        int length = expression.length();
-        if (length > 0) {
-            for (int i = 0; i < length; i++) {
-
-
-            }
-        }
-    }
 }
 
 
