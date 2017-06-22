@@ -7,7 +7,7 @@ public class LeProcess implements Runnable {
 
     /**
      * @Description:这个类用于语言Le的计算
-     * @author 周杰
+     * @author
      * @date 2016/06/20
      */
     private Display disPlay;

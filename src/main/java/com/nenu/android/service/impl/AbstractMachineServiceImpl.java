@@ -1,6 +1,7 @@
 package com.nenu.android.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.nenu.android.service.AbstractMachineService;
 import com.nenu.android.service.IndexService;
 import org.apache.xerces.xs.StringList;
 import org.springframework.stereotype.Service;
@@ -17,82 +18,85 @@ import java.util.Map;
  * Time: 14:16
  */
 @Service("abstractMachineService")
-public class AbstractMachineServiceImpl {
+public class AbstractMachineServiceImpl implements AbstractMachineService{
 
-//    private String control[] = new String[100];
-//
-//    private String stack[] = new String[100];
-//
-//    private static String denv;
-//
-//    private static Map<String, Integer> Denv = new HashMap<String, Integer>();
-//
-//    private int controlsize, stacktop;
+    private static String expression = "";
+    private static String initDenv = "";
+    //动态环境 map键值对形式存储
+    private static Map<String,Integer> DEnv = new HashMap<String,Integer>();
+    private static int controlSize = 0 ;
+    private static int stackTop = 0;
 
-    public JSONObject start(String expression, String denv) throws Exception {
+    private String control[] = new String[100];
+
+    private String stack[] = new String[100];
+
+    public JSONObject start(String expression, String initDenv) throws Exception {
         JSONObject json = new JSONObject();
-        String control[] = new String[100];
-        for(int i = 0 ; i < expression.length();i++){
-            control[i] = expression.substring(i,i+1);
-        }
-        String initControlField = initControl(expression.length(),control);
-        String initStackField = "[]";
-        String initDenvField = denv;
+        DEnv = init_Denv(initDenv);
+        control[controlSize++] = expression;
+        String initControlField = initControl();
+        String initStackField = initStack();
+        String initDenvFeild = initDenv();
         json.put("initControlField",initControlField);
         json.put("initStackField",initStackField);
-        json.put("initDenvField",initDenvField);
+        json.put("initDenvField",initDenvFeild);
         return json;
     }
 
-    public JSONObject next(String expression) throws Exception {
+    public JSONObject next(String controlField,String stackField,String initDenvField) throws Exception {
         JSONObject json = new JSONObject();
+        while(controlSize > 0){
+            cal(controlSize,control,stack,DEnv,stackTop);
+        }
         return json;
 
     }
 
-    private String initControl(int controlsize, String control[]){
-        String controlIntial = "[";
-        for (int i = controlsize - 1; i >= 0; i--) {
-            controlIntial += control[i];
+    private String initControl(){
+        String controlInitial = "[";
+        for (int i = controlSize - 1; i >= 0; i--) {
+            controlInitial += control[i];
             if (i != 0)
-                controlIntial += ", ";
+                controlInitial += ", ";
         }
-        controlIntial += "]";
-        System.out.println("Control: " + controlIntial);
-        return controlIntial;
+        controlInitial += "]";
+        System.out.println("Control: " + controlInitial);
+        return controlInitial;
     }
 
-    private String initStack(int stacktop,String stack[]){
-        String stackIntial = "[";
-        for (int i = stacktop - 1; i >= 0; i--) {
-            stackIntial += stack[i];
+    private String initStack(){
+        String stackInitial = "[";
+        for (int i = stackTop - 1; i >= 0; i--) {
+            stackInitial += stack[i];
             if (i != 0)
-                stackIntial += ", ";
+                stackInitial += ", ";
         }
-        stackIntial += "]";
-        System.out.println("Stack   :" + stackIntial);
-        return stackIntial;
+        stackInitial += "]";
+        System.out.println("Stack   :" + stackInitial);
+        return stackInitial;
     }
 
-    private String initDenv(Map<String, Integer> Denv){
-        String denvIntial = "[";
+    private String initDenv(){
+        String denvInitial = "[";
         Boolean flaginitial = false;
-        for (Map.Entry<String, Integer> x : Denv.entrySet()) {
+        for (Map.Entry<String, Integer> x : DEnv.entrySet()) {
             if (flaginitial)
-                denvIntial += ", ";
+                denvInitial += ", ";
             flaginitial = true;
-            denvIntial += x.getKey() + "->" + String.valueOf(x.getValue());
+            denvInitial += x.getKey() + "->" + String.valueOf(x.getValue());
         }
-        denvIntial += "]";
-        System.out.println("DEnv   :" + denvIntial);
-        return denvIntial;
+        denvInitial += "]";
+        System.out.println("DEnv   :" + denvInitial);
+        return denvInitial;
     }
 
 
 
-    private void cal(int controlsize, String control[], String stack[], Map<String, Integer> Denv, int stacktop) {
-        System.out.println("开始 ");
-        System.out.println("初始状态:");
+    private JSONObject cal(int controlsize, String control[], String stack[], Map<String, Integer> Denv, int stacktop) {
+
+        //存放结果
+        JSONObject jsonObject = new JSONObject();
 
         while (controlsize > 0) {
             String now = control[controlsize - 1];
@@ -165,6 +169,8 @@ public class AbstractMachineServiceImpl {
             denvOut += "]";
             System.out.println("DEnv   :" + denvOut);
 
+            jsonObject.put("rule",)
+            jsonObject.put("control",controlOut);
         }
 
         System.out.println("结束 ");
@@ -304,7 +310,7 @@ public class AbstractMachineServiceImpl {
         return ret;
     }
 
-    private Map<String, Integer> init_Denv(String denv, Map<String, Integer> Denv) {
+    private Map<String, Integer> init_Denv(String denv) {
         int len = denv.length();
         for (int i = 0; i < len; i++) {
             char c = denv.charAt(i);
@@ -332,8 +338,8 @@ public class AbstractMachineServiceImpl {
                 if (i < len)
                     c = denv.charAt(i);
             }
-            Denv.put(letter, number);
+            DEnv.put(letter, number);
         }
-        return Denv;
+        return DEnv;
     }
 }

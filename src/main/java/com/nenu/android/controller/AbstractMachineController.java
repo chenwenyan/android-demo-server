@@ -2,6 +2,8 @@ package com.nenu.android.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.nenu.android.service.AbstractMachineService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +24,9 @@ import java.util.Stack;
 @Controller
 public class AbstractMachineController {
 
+    @Autowired
+    private AbstractMachineService abstractMachineService;
+
     @RequestMapping(value = "/abstractMachine", method = RequestMethod.GET)
     public String getExpress(HttpServletRequest request, HttpServletResponse response) {
         return "abstractMachine";
@@ -29,67 +34,53 @@ public class AbstractMachineController {
 
     @RequestMapping(value = "/start", method = RequestMethod.POST)
     @ResponseBody
-    public JSONObject transExpression(HttpServletRequest request, HttpServletResponse response,
+    public JSONObject start(HttpServletRequest request, HttpServletResponse response,
                                       Model model) {
         JSONObject json = new JSONObject();
+        JSONObject jsonObject = new JSONObject();
+        int code = 0;
+        String msg = "";
         String expression = request.getParameter("expressionInput");
+        String initDenv = request.getParameter("initDenvInput");
         if (expression.trim() == "" || expression.trim() == null) {
-            json.put("code", 1);
-            json.put("data", null);
-            json.put("msg", "输入字符为空！");
-        } else {
-
+            msg = "输入字符为空!";
+        } else try {
+            jsonObject = abstractMachineService.start(expression, initDenv);
+            code = 1;
+            msg = "初始化成功！";
+        } catch (Exception e) {
+            msg = "解析出错！";
         }
+        json.put("code", code);
+        json.put("data", jsonObject);
+        json.put("msg", msg);
         return json;
     }
 
     @RequestMapping(value = "/next", method = RequestMethod.POST)
     @ResponseBody
-    public JSONObject comExpression(HttpServletRequest request, HttpServletResponse response,
+    public JSONObject next(HttpServletRequest request, HttpServletResponse response,
                                                 Model model) {
-        JSONObject json = new JSONObject();//存放处理结果
+        JSONObject json = new JSONObject();//存放返回到页面的结果
+        JSONObject jsonObject = new JSONObject();//解析结果
         String control = request.getParameter("controlInput");
+        String stack = request.getParameter("stackInput");
         String DEnv = request.getParameter("DEnvInput");
         String msg = "";
-        String temp = "";
-        int key = 0;
-        Stack<String> opt = new Stack<String>(); //操作符
-        Stack<String> varible = new Stack<String>(); //变量
-        Stack<String> consts = new Stack<String>(); //常量
+        int code = 1;
         if(isMatch(control)){
-            for(int i = 0; i < control.length(); i++){
-//                System.out.println(control.charAt(i));
-                char letter = control.charAt(i);
-                if(letter == '('){
-                   key = i + 1;
-                   continue;
-                }else{
-                    if(i >= 1) {
-                        temp = control.substring(key, i - 1);
-                    }
-                    if(temp == "mul" || temp == "add" || temp == "ge"){
-                        opt.push(temp);
-                    }else if(temp == "const"){
-                       consts.push(temp);
-                    }else{
-                        varible.push(temp);
-                    }
-                }
-
+            try{
+                jsonObject = abstractMachineService.next(control,stack,DEnv);
+                msg = "解析正确！";
+            }catch (Exception e){
+                code = 0;
+                msg = "解析出错了！";
             }
-            msg = "控制区初始化正确";
-            System.out.println("opt");
-            System.out.println(opt);
-            System.out.println("varible");
-            System.out.println(varible);
-            System.out.println("consts");
-            System.out.println(consts);
         }else {
             msg = "控制区括号不匹配！";
         }
-        json.put("control",opt);
-        json.put("stack",varible);
-        json.put("DEnv",consts);
+        json.put("code",code);
+        json.put("data",jsonObject);
         json.put("msg",msg);
         return json;
     }

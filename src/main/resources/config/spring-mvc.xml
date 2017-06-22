@@ -65,7 +65,7 @@
           p:prefix="/WEB-INF/views/" p:suffix=".jsp"/>
 
     <!--静态资源路径-->
-    <!--<mvc:resources mapping="/js/**" location="WEB-INF/static/js/" />-->
+    <mvc:resources mapping="/static/**" location="WEB-INF/static/app_3th/" />
     <!--<mvc:resources mapping="/css/**" location="WEB-INF/static/css/" />-->
     <!--<mvc:resources mapping="/img/**" location="WEB-INF/static/img/" />-->
 

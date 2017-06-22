@@ -9,77 +9,137 @@
 <html>
 <head>
     <title>抽象机表达式动态演示</title>
-    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/jQuery/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="/static/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.css">
 </head>
 <body>
-<div>
-    <form name="expressionForm" id="expressionForm" action="/getExpression" method="post">
-        请输入表达式：
-        <input type="text" name="expressionInput" id="expressionInput"/>
-        <br>
-        <button type="reset">重置</button>
-        <button name="submitExpression" id="submitExpression">提交</button>
-    </form>
-    <form name="comForm" id="comForm" action="/compute" method="post">
-        <div name="control" id="control">
-            控制区：
-            <div><textarea id="controlInput" name="controlInput"></textarea></div>
+<div style="width:50%;margin-left:25%">
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">语言Le的抽象机状态转换动态演示</h3>
         </div>
-        <div name="stack" id="stack">
-            栈：
-            <div><textarea id="stackInput" name="stackInput">[]</textarea></div>
+        <div class="panel-body">
+            <form name="expressionForm" id="expressionForm" role="form">
+                <div class="form-group">
+                    <label for="expressionInput">表达式：</label>
+                    <input class="form-control" type="text" name="expressionInput" id="expressionInput"
+                           value="ge(add(var(x),mul(cons(2),var(y))),var(z))"/>
+                </div>
+                <div class="form-group">
+                    <label for="DEnvInput">
+                        初始化动态环境：
+                    </label>
+                    <input class="form-control" type="text" name="initDenvInput" id="initDenvInput"
+                           value="x->34, y->7, z->50"/>
+                </div>
+            </form>
         </div>
-        <div name="DEnv" id="DEnv">
-            动态环境：
-            <div><textarea id="DEnvInput" name="DEnvInput"></textarea></div>
+        <div class="panel-footer">
+            <button class="btn btn-default" type="reset">重置</button>
+            <button class="btn btn-primary" name="submitExpression" id="submitExpression">提交</button>
         </div>
-        <button type="reset">重置</button>
-        <button name="computeBtn" id="computeBtn">下一步</button>
-    </form>
-    <div name="msg" id="msg">
-        提示：
-        <div id="msgDiv" name="msgDiv">${result.msg}</div>
     </div>
+    <div class="panel panel-success">
+        <div class="panel-heading">
+            <h3 class="panel-title">结果</h3>
+        </div>
+        <div class="panel-body">
+            <form name="comForm" id="comForm" role="form">
+                <div class="form-group">
+                    <div name="rule" id="rule" class="">
+                        <label for="controlInput">使用规则：</label>
+                        <div><textarea class="form-control" rows="2" id="ruleInput" name="ruleInput"></textarea></div>
+                    </div>
+                    <div name="control" id="control" class="">
+                        <label for="controlInput">控制区：</label>
+                        <div><textarea class="form-control" rows="2" id="controlInput" name="controlInput"></textarea></div>
+                    </div>
+                    <div name="stack" id="stack" class="">
+                        <label for="stackInput">栈：</label>
+                        <div><textarea class="form-control" rows="2" id="stackInput" name="stackInput"></textarea></div>
+                    </div>
+                    <div name="DEnv" id="DEnv" class="">
+                        <label for="DEnvInput">动态环境：</label>
+                        <div><textarea class="form-control" rows="2" id="DEnvInput" name="DEnvInput"></textarea></div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="panel-footer">
+            <button class="btn btn-default" type="reset">重置</button>
+            <button class="btn btn-success" name="computeBtn" id="computeBtn">下一步</button>
+        </div>
+    </div>
+
+    <div name="msg" id="msg" class="alert alert-block">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        <strong>提示：</strong>
+        <p id="msgDiv" name="msgDiv"></p>
+    </div>
+
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function () {
-        $("#submitExpression").onclick = function () {
-            var expression = $("#expressionInput").value.trim();
+    $(function () {
+        $("#submitExpression").click(function (e) {
+            var expression = $("#expressionInput").val().trim();
+            var initDenv = $("#initDenvInput").val().trim();
             if (expression == "" || expression == null) {
                 alert("输入表达式不能为空！");
             } else {
                 $.ajax({
-                    url: "/getExpression",
-                    data: expression,
+                    type: "POST",
+                    url: "/start",
+                    data: {expressionInput: expression, initDenvInput: initDenv},
                     success: function (res) {
+                        console.log(res);
                         if (res.code == 1) {
-                            $("#controlDiv").innerText = res.data;
+                            console.log(res.data);
+                            var data = res.data;
+                            $("#controlInput").val(data.initControlField);
+                            $("#stackInput").val(data.initStackField);
+                            $("#DEnvInput").val(data.initDenvField);
                         } else {
                             $("#msgDiv").innerHTML = res.msg;
                         }
-                    }
+                    },
+                    error: function (res) {
+                        alert("请求出错！");
+                    },
+                    dataType: "json"
                 });
             }
-        }
+        });
 
-        $("#submitExpression").onclick = function () {
-            var control = $("#controlInput").value.trim();
-            var DEnv = $("#DEnvInput").value.trim();
-            if (control == "" || control == null) {
-                alert("控制区不能为空！");
-                return;
-            }else if(DEnv == "" || DEnv == null){
-                alert("动态环境变量不能为空！");
-                return;
-            } else {
-                $.post( "/compute", {control:control,DEnv : DEnv}, function (res) {
-                        $("#controlInput").innerText = res.control;
-                        $("#stackInput").innerText = res.stack;
-                        $("#DEnvInput").innerText = res.DEnv;
-                });
-            }
-        }
+        $("#comForm").click(function (e) {
+            var control = $("#controlInput").val();
+            var stack = $("#stackInput").val();
+            var DEnv = $("#DEnvInput").val();
+            $.ajax({
+                type: "POST",
+                url: "/next",
+                data: {control: control, stack: stack, DEnv:DEnv},
+                success: function (res) {
+                    console.log(res);
+                    if (res.code == 1) {
+                        console.log(res.data);
+                        var data = res.data;
+                        $("#ruleInput").val(data.rule);
+                        $("#controlInput").val(data.control);
+                        $("#stackInput").val(data.stack);
+                        $("#DEnvInput").val(data.DEnv);
+                    } else {
+                        $("#msgDiv").innerHTML = res.msg;
+                    }
+                },
+                error: function (res) {
+                    alert("请求出错！");
+                },
+                dataType: "json"
+            });
+        });
 
     });
 </script>
