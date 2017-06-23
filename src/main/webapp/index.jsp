@@ -100,7 +100,7 @@
                             var data = res.data;
                             $("#controlInput").val(data.initControlField);
                             $("#stackInput").val(data.initStackField);
-                            $("#DEnvInput").val(data.initDenvField);
+                            $("#DEnvInput").val(data.initDEnvField);
                         } else {
                             $("#msgDiv").innerHTML = res.msg;
                         }
@@ -113,14 +113,14 @@
             }
         });
 
-        $("#comForm").click(function (e) {
+        $("#computeBtn").click(function (e) {
             var control = $("#controlInput").val();
             var stack = $("#stackInput").val();
             var DEnv = $("#DEnvInput").val();
             $.ajax({
                 type: "POST",
                 url: "/next",
-                data: {control: control, stack: stack, DEnv:DEnv},
+                data: {control: control, stack:stack, DEnv: DEnv},
                 success: function (res) {
                     console.log(res);
                     if (res.code == 1) {

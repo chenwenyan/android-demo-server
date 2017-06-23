@@ -63,9 +63,9 @@ public class AbstractMachineController {
                                                 Model model) {
         JSONObject json = new JSONObject();//存放返回到页面的结果
         JSONObject jsonObject = new JSONObject();//解析结果
-        String control = request.getParameter("controlInput");
-        String stack = request.getParameter("stackInput");
-        String DEnv = request.getParameter("DEnvInput");
+        String control = request.getParameter("control");
+        String stack = request.getParameter("stack");
+        String DEnv = request.getParameter("DEnv");
         String msg = "";
         int code = 1;
         if(isMatch(control)){

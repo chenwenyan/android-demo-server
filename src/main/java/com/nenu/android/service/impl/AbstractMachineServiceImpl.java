@@ -20,34 +20,42 @@ import java.util.Map;
 @Service("abstractMachineService")
 public class AbstractMachineServiceImpl implements AbstractMachineService{
 
-    private static String expression = "";
-    private static String initDenv = "";
+//    private static String expression = "";
+//    private static String initDEnv = "";
+
     //动态环境 map键值对形式存储
     private static Map<String,Integer> DEnv = new HashMap<String,Integer>();
+    //初始化控制区操作符或者常量/变量个数
     private static int controlSize = 0 ;
+    //初始化栈顶元素
     private static int stackTop = 0;
-
+    //存放解析后的操作符、常量、变量
     private String control[] = new String[100];
-
+    //存放中间变量运算结果
     private String stack[] = new String[100];
+    //标记使用规则
+    private String rule = "";
 
-    public JSONObject start(String expression, String initDenv) throws Exception {
+    public JSONObject start(String expression, String initDEnv) throws Exception {
         JSONObject json = new JSONObject();
-        DEnv = init_Denv(initDenv);
+        DEnv = init_DEnv(initDEnv);
         control[controlSize++] = expression;
         String initControlField = initControl();
         String initStackField = initStack();
-        String initDenvFeild = initDenv();
+        String initDEnvFeild = initDEnv();
         json.put("initControlField",initControlField);
         json.put("initStackField",initStackField);
-        json.put("initDenvField",initDenvFeild);
+        json.put("initDEnvField",initDEnvFeild);
         return json;
     }
 
-    public JSONObject next(String controlField,String stackField,String initDenvField) throws Exception {
+    public JSONObject next(String controlField,String stackField,String initDEnvField) throws Exception {
         JSONObject json = new JSONObject();
         while(controlSize > 0){
-            cal(controlSize,control,stack,DEnv,stackTop);
+            System.out.println("进入请求业务逻辑处理");
+            System.out.println("controlSize:" + controlSize);
+            System.out.println("——————————————————————————————————————————————————————————————————————————");
+            json = cal();
         }
         return json;
 
@@ -77,71 +85,73 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
         return stackInitial;
     }
 
-    private String initDenv(){
-        String denvInitial = "[";
-        Boolean flaginitial = false;
+    private String initDEnv(){
+        String DEnvInitial = "[";
+        Boolean flagInitial = false;
         for (Map.Entry<String, Integer> x : DEnv.entrySet()) {
-            if (flaginitial)
-                denvInitial += ", ";
-            flaginitial = true;
-            denvInitial += x.getKey() + "->" + String.valueOf(x.getValue());
+            if (flagInitial)
+                DEnvInitial += ", ";
+            flagInitial = true;
+            DEnvInitial += x.getKey() + "->" + String.valueOf(x.getValue());
         }
-        denvInitial += "]";
-        System.out.println("DEnv   :" + denvInitial);
-        return denvInitial;
+        DEnvInitial += "]";
+        System.out.println("DEnv   :" + DEnvInitial);
+        return DEnvInitial;
     }
 
 
 
-    private JSONObject cal(int controlsize, String control[], String stack[], Map<String, Integer> Denv, int stacktop) {
+    private JSONObject cal() {
 
         //存放结果
         JSONObject jsonObject = new JSONObject();
 
-        while (controlsize > 0) {
-            String now = control[controlsize - 1];
-            controlsize--;
+        while (controlSize > 0) {
+            String now = control[controlSize - 1];
+            controlSize--;
             String fir = getfirString(now);
             if (fir.equals("ge")) {
                 if (now.length() > 2)
-                    Devide(now, control, controlsize);
+                    Devide(now);
                 else
-                    gaoGe(stack, stacktop);
+                    gaoGe();
             } else if (fir.equals("se")) {
                 if (now.length() > 2)
-                    Devide(now, control, controlsize);
+                    Devide(now);
                 else
-                    gaoSe(stack, stacktop);
+                    gaoSe();
             } else if (fir.equals("add")) {
                 if (now.length() > 3)
-                    Devide(now, control, controlsize);
+                    Devide(now);
                 else
-                    gaoAdd(stack, stacktop);
+                    gaoAdd();
             } else if (fir.equals("sub")) {
                 if (now.length() > 3)
-                    Devide(now, control, controlsize);
+                    Devide(now);
                 else
-                    gaoSub(stack, stacktop);
+                    gaoSub();
             } else if (fir.equals("mul")) {
                 if (now.length() > 3)
-                    Devide(now, control, controlsize);
+                    Devide(now);
                 else
-                    gaoMul(stack, stacktop);
+                    gaoMul();
             } else if (fir.equals("div")) {
                 if (now.length() > 3)
-                    Devide(now, control, controlsize);
+                    Devide(now);
                 else
-                    gaoDiv(stack, stacktop);
+                    gaoDiv();
             } else if (fir.equals("cons")) {
+                rule = "常量规则：(vs, const(c):e, delta) => (c:vs, e, delta)";
                 System.out.println("常量规则：(vs, const(c):e, delta) => (c:vs, e, delta)");
-                stack[stacktop++] = getAll(now);
+                stack[stackTop++] = getAll(now);
             } else {
+                rule = "变量规则：(vs, var(c):e, delta) => (delta(x):vs, e, delta)";
                 System.out.println("变量规则：(vs, var(c):e, delta) => (delta(x):vs, e, delta)");
-                stack[stacktop++] = String.valueOf(Denv.get(getAll(now)));
+                stack[stackTop++] = String.valueOf(DEnv.get(getAll(now)));
             }
 
             String controlOut = "[";
-            for (int i = controlsize - 1; i >= 0; i--) {
+            for (int i = controlSize - 1; i >= 0; i--) {
                 controlOut += control[i];
                 if (i != 0)
                     controlOut += ", ";
@@ -150,7 +160,7 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
             System.out.println("Control: " + controlOut);
 
             String stackOut = "[";
-            for (int i = stacktop - 1; i >= 0; i--) {
+            for (int i = stackTop - 1; i >= 0; i--) {
                 stackOut += stack[i];
                 if (i != 0)
                     stackOut += ", ";
@@ -158,22 +168,25 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
             stackOut += "]";
             System.out.println("Stack   :" + stackOut);
 
-            String denvOut = "[";
+            String DEnvOut = "[";
             Boolean flagOut = false;
-            for (Map.Entry<String, Integer> x : Denv.entrySet()) {
+            for (Map.Entry<String, Integer> x : DEnv.entrySet()) {
                 if (flagOut)
-                    denvOut += ", ";
+                    DEnvOut += ", ";
                 flagOut = true;
-                denvOut += x.getKey() + "->" + String.valueOf(x.getValue());
+                DEnvOut += x.getKey() + "->" + String.valueOf(x.getValue());
             }
-            denvOut += "]";
-            System.out.println("DEnv   :" + denvOut);
+            DEnvOut += "]";
+            System.out.println("DEnv   :" + DEnvOut);
 
-            jsonObject.put("rule",)
+            jsonObject.put("rule",rule);
             jsonObject.put("control",controlOut);
+            jsonObject.put("stack",stackOut);
+            jsonObject.put("DEnv",DEnvOut);
         }
 
         System.out.println("结束 ");
+        return jsonObject;
     }
 
 
@@ -190,52 +203,57 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
         return ret;
     }
 
-    private void gaoDiv(String stack[], int stacktop) {
+    private void gaoDiv() {
+        rule = "除法规则：(n1:n2:vs, div:e, delta) => (n:vs, e, delta), n= n1/n2";
         System.out.println("除法规则：(n1:n2:vs, div:e, delta) => (n:vs, e, delta), n= n1/n2");
-        int a = Integer.valueOf(stack[--stacktop]);
-        int b = Integer.valueOf(stack[--stacktop]);
-        stack[stacktop++] = String.valueOf(a / b);
+        int a = Integer.valueOf(stack[--stackTop]);
+        int b = Integer.valueOf(stack[--stackTop]);
+        stack[stackTop++] = String.valueOf(a / b);
     }
 
-    private void gaoMul(String stack[], int stacktop) {
+    private void gaoMul() {
+        rule = "乘法规则：(n1:n2:vs, mul:e, delta) => (n:vs, e, delta), n= n1*n2";
         System.out.println("乘法规则：(n1:n2:vs, mul:e, delta) => (n:vs, e, delta), n= n1*n2");
-        int a = Integer.valueOf(stack[--stacktop]);
-        int b = Integer.valueOf(stack[--stacktop]);
-        stack[stacktop++] = String.valueOf(a * b);
+        int a = Integer.valueOf(stack[--stackTop]);
+        int b = Integer.valueOf(stack[--stackTop]);
+        stack[stackTop++] = String.valueOf(a * b);
     }
 
-    private void gaoSub(String stack[], int stacktop) {
+    private void gaoSub() {
+        rule = "减法规则：(n1:n2:vs, sub:e, delta) => (n:vs, e, delta), n= n1-n2";
         System.out.println("减法规则：(n1:n2:vs, sub:e, delta) => (n:vs, e, delta), n= n1-n2");
-        int a = Integer.valueOf(stack[--stacktop]);
-        int b = Integer.valueOf(stack[--stacktop]);
-        stack[stacktop++] = String.valueOf(a - b);
+        int a = Integer.valueOf(stack[--stackTop]);
+        int b = Integer.valueOf(stack[--stackTop]);
+        stack[stackTop++] = String.valueOf(a - b);
     }
 
-    private void gaoAdd(String stack[], int stacktop) {
+    private void gaoAdd() {
         System.out.println("加法规则：(n1:n2:vs, add:e, delta) => (n:vs, e, delta), n= n1+n2");
-        int a = Integer.valueOf(stack[--stacktop]);
-        int b = Integer.valueOf(stack[--stacktop]);
-        stack[stacktop++] = String.valueOf(a + b);
+        int a = Integer.valueOf(stack[--stackTop]);
+        int b = Integer.valueOf(stack[--stackTop]);
+        stack[stackTop++] = String.valueOf(a + b);
     }
 
-    private void gaoSe(String stack[], int stacktop) {
+    private void gaoSe() {
+        rule = "比较规则：(n1:n2:vs, se:e, delta) => (n:vs, e, delta), n = (n1<=n2)";
         System.out.println("比较规则：(n1:n2:vs, se:e, delta) => (n:vs, e, delta), n = (n1<=n2)");
-        int a = Integer.valueOf(stack[--stacktop]);
-        int b = Integer.valueOf(stack[--stacktop]);
+        int a = Integer.valueOf(stack[--stackTop]);
+        int b = Integer.valueOf(stack[--stackTop]);
         if (a <= b)
-            stack[stacktop++] = "true";
+            stack[stackTop++] = "true";
         else
-            stack[stacktop++] = "false";
+            stack[stackTop++] = "false";
     }
 
-    private void gaoGe(String stack[], int stacktop) {
+    private void gaoGe() {
+        rule = "比较规则：(n1:n2:vs, ge:e, delta) => (n:vs, e, delta), n = (n1>=n2)";
         System.out.println("比较规则：(n1:n2:vs, ge:e, delta) => (n:vs, e, delta), n = (n1>=n2)");
-        int a = Integer.valueOf(stack[--stacktop]);
-        int b = Integer.valueOf(stack[--stacktop]);
+        int a = Integer.valueOf(stack[--stackTop]);
+        int b = Integer.valueOf(stack[--stackTop]);
         if (a >= b)
-            stack[stacktop++] = "true";
+            stack[stackTop++] = "true";
         else
-            stack[stacktop++] = "false";
+            stack[stackTop++] = "false";
     }
 
     private String getfirString(String now) {
@@ -253,34 +271,40 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
             if (i < len)
                 c = now.charAt(i);
         }
+        System.out.println("getFirString:" + ret);
         return ret;
     }
 
-    private void Devide(String now, String control[], int controlsize) {
+    private void Devide(String now) {
+        rule = "分解规则:(vs, op(e1,e2):e, delta) => (vs, e2:e1:op:e, delta)";
         System.out.println("分解规则:(vs, op(e1,e2):e, delta) => (vs, e2:e1:op:e, delta)");
-        control[controlsize++] = getfirString(now);
-        control[controlsize++] = getPartone(now);
-        control[controlsize++] = getParttwo(now);
+        control[controlSize++] = getfirString(now);
+        control[controlSize++] = getPartone(now);
+        control[controlSize++] = getParttwo(now);
     }
 
     private String getPartone(String now) {
         int len = now.length(), i = 0;
-        while (i < len && now.charAt(i) != '(')
+        while (i < len && now.charAt(i) != '('){
             i++;
+        }
         i++;
         String ret = "";
         int cnt = 0;
-        while (i < len && now.charAt(i) == ' ')
-            i++;
-        //      System.out.print(i);
-        while (i < len && (now.charAt(i) != ',' || cnt != 0)) {
-            ret += now.charAt(i);
-            if (now.charAt(i) == '(')
-                cnt++;
-            if (now.charAt(i) == ')')
-                cnt--;
+        while (i < len && now.charAt(i) == ' '){
             i++;
         }
+        while (i < len && (now.charAt(i) != ',' || cnt != 0)) {
+            ret += now.charAt(i);
+            if (now.charAt(i) == '('){
+                cnt++;
+            }
+            if (now.charAt(i) == ')'){
+                cnt--;
+            }
+            i++;
+        }
+        System.out.println("getPartOne :" + ret );
         return ret;
     }
 
@@ -290,53 +314,64 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
             i++;
         i++;
         int cnt = 0;
-        while (i < len && now.charAt(i) == ' ')
+        while (i < len && now.charAt(i) == ' '){
             i++;
+        }
         while (i < len && (now.charAt(i) != ',' || cnt != 0)) {
-            if (now.charAt(i) == '(')
+            if (now.charAt(i) == '('){
                 cnt++;
-            if (now.charAt(i) == ')')
+            }
+            if (now.charAt(i) == ')'){
                 cnt--;
+            }
             i++;
         }
         i++;
-        while (i < len && now.charAt(i) == ' ')
+        while (i < len && now.charAt(i) == ' '){
             i++;
+        }
         String ret = "";
         while (i < len - 1) {
             ret += now.charAt(i);
             i++;
         }
+        System.out.println("getPartTwo :" + ret );
         return ret;
     }
 
-    private Map<String, Integer> init_Denv(String denv) {
-        int len = denv.length();
+    /**
+     * 初始化动态环境
+     *
+     * @param Denv
+     * @return
+     */
+    private Map<String, Integer> init_DEnv(String Denv) {
+        int len = Denv.length();
         for (int i = 0; i < len; i++) {
-            char c = denv.charAt(i);
+            char c = Denv.charAt(i);
             while (i < len && (c < 'a' || c > 'z')) {
                 i++;
                 if (i < len)
-                    c = denv.charAt(i);
+                    c = Denv.charAt(i);
             }
             String letter = "";
             while (i < len && c >= 'a' && c <= 'z') {
                 letter += c;
                 i++;
                 if (i < len)
-                    c = denv.charAt(i);
+                    c = Denv.charAt(i);
             }
             while (i < len && (c < '0' || c > '9')) {
                 i++;
                 if (i < len)
-                    c = denv.charAt(i);
+                    c = Denv.charAt(i);
             }
             int number = 0;
             while (i < len && c >= '0' && c <= '9') {
                 number = number * 10 + c - '0';
                 i++;
                 if (i < len)
-                    c = denv.charAt(i);
+                    c = Denv.charAt(i);
             }
             DEnv.put(letter, number);
         }
