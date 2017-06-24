@@ -53,7 +53,8 @@
                     </div>
                     <div name="control" id="control" class="">
                         <label for="controlInput">控制区：</label>
-                        <div><textarea class="form-control" rows="2" id="controlInput" name="controlInput"></textarea></div>
+                        <div><textarea class="form-control" rows="2" id="controlInput" name="controlInput"></textarea>
+                        </div>
                     </div>
                     <div name="stack" id="stack" class="">
                         <label for="stackInput">栈：</label>
@@ -96,7 +97,6 @@
                     success: function (res) {
                         console.log(res);
                         if (res.code == 1) {
-                            console.log(res.data);
                             var data = res.data;
                             $("#ruleInput").val();
                             $("#controlInput").val("");
@@ -124,34 +124,22 @@
             $.ajax({
                 type: "POST",
                 url: "/next",
-                data: {control: control, stack:stack, DEnv: DEnv},
+                data: {control: control, stack: stack, DEnv: DEnv},
                 success: function (res) {
                     console.log(res);
                     if (res.code == 1) {
-                        console.log(res.data);
-                        var obj = res.data;
-                        console.log(obj);
-                        $("#ruleInput").val("");
-                        $("#ruleInput").val(obj.rule);
-                        $("#controlInput").val("");
-                        $("#controlInput").val(obj.control);
-                        $("#stackInput").val("");
-                        $("#stackInput").val(obj.stack);
-                        $("#DEnvInput").val("");
-                        $("#DEnvInput").val(obj.DEnv);
-//                        setTimeout(setValue,3000);
-//                        function setValue(){
-//                            for(var obj in data) {
-//                                $("#ruleInput").val("");
-//                                $("#ruleInput").val(obj.rule);
-//                                $("#controlInput").val("");
-//                                $("#controlInput").val(obj.control);
-//                                $("#stackInput").val("");
-//                                $("#stackInput").val(obj.stack);
-//                                $("#DEnvInput").val("");
-//                                $("#DEnvInput").val(obj.DEnv);
-//                            }
-//                        }
+                        var item = res.data.data;
+                        for (var i = 0; i < item.length; i++) {
+                            $("#ruleInput").val("");
+                            $("#ruleInput").val(item[i]["rule"]);
+                            $("#controlInput").val("");
+                            $("#controlInput").val(item[i]["control"]);
+                            $("#stackInput").val("");
+                            $("#stackInput").val(item[i]["stack"]);
+                            $("#DEnvInput").val("");
+                            $("#DEnvInput").val(item[i]["DEnv"]);
+                            sleep(5000);
+                        }
                     }
                 },
                 error: function (res) {
@@ -161,6 +149,12 @@
             });
         });
 
+        function sleep(ms) {
+            var starttime = new Date().getTime();
+            do {
+
+            } while ((new Date().getTime() - starttime) < ms)
+        }
     });
 </script>
 </body>

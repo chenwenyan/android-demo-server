@@ -28,6 +28,10 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
     //标记使用规则
     private String rule = "";
     private int count = 1;
+    LinkedHashMap<Integer,JSONObject> map = new LinkedHashMap<Integer, JSONObject>();
+
+    //存放结果
+    List<JSONObject> res = new ArrayList<JSONObject>();
 
     public JSONObject start(String expression, String initDEnv) throws Exception {
         JSONObject json = new JSONObject();
@@ -39,15 +43,19 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
         json.put("initControlField",initControlField);
         json.put("initStackField",initStackField);
         json.put("initDEnvField",initDEnvFeild);
+        res.clear();
+        count = 1;
         return json;
     }
 
     public JSONObject next(String controlField,String stackField,String initDEnvField) throws Exception {
         JSONObject json = new JSONObject();
-        while(controlSize > 0){
+//        while(controlSize > 0){
 //            json.put("res",cal());
-            json = cal();
-        }
+//            json = cal();
+            cal();
+            json.put("data",res);
+//        }
         return json;
     }
 
@@ -91,11 +99,10 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
 
 
 
-    private  JSONObject cal() {
-        //存放结果
-        JSONObject jsonObject = new JSONObject();
-        List<JSONObject> res = new ArrayList<JSONObject>();
+    private  void cal() {
+
         while (controlSize > 0) {
+            JSONObject jsonObject = new JSONObject();
             String now = control[controlSize - 1];
             controlSize--;
             String fir = getfirString(now);
@@ -173,11 +180,14 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
             jsonObject.put("stack",stackOut);
             jsonObject.put("DEnv",DEnvOut);
             System.out.println(jsonObject);
+            map.put(count,jsonObject);
+            res.add(jsonObject);
 //            res.set(count, jsonObject);
             count++;
         }
         System.out.println("结束 ");
-        return jsonObject;
+        System.out.println(map);
+//        return jsonObject;
     }
 
 
