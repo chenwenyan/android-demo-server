@@ -98,8 +98,12 @@
                         if (res.code == 1) {
                             console.log(res.data);
                             var data = res.data;
+                            $("#ruleInput").val();
+                            $("#controlInput").val("");
                             $("#controlInput").val(data.initControlField);
+                            $("#stackInput").val("");
                             $("#stackInput").val(data.initStackField);
+                            $("#DEnvInput").val("");
                             $("#DEnvInput").val(data.initDEnvField);
                         } else {
                             $("#msgDiv").innerHTML = res.msg;
@@ -125,13 +129,29 @@
                     console.log(res);
                     if (res.code == 1) {
                         console.log(res.data);
-                        var data = res.data;
-                        $("#ruleInput").val(data.rule);
-                        $("#controlInput").val(data.control);
-                        $("#stackInput").val(data.stack);
-                        $("#DEnvInput").val(data.DEnv);
-                    } else {
-                        $("#msgDiv").innerHTML = res.msg;
+                        var obj = res.data;
+                        console.log(obj);
+                        $("#ruleInput").val("");
+                        $("#ruleInput").val(obj.rule);
+                        $("#controlInput").val("");
+                        $("#controlInput").val(obj.control);
+                        $("#stackInput").val("");
+                        $("#stackInput").val(obj.stack);
+                        $("#DEnvInput").val("");
+                        $("#DEnvInput").val(obj.DEnv);
+//                        setTimeout(setValue,3000);
+//                        function setValue(){
+//                            for(var obj in data) {
+//                                $("#ruleInput").val("");
+//                                $("#ruleInput").val(obj.rule);
+//                                $("#controlInput").val("");
+//                                $("#controlInput").val(obj.control);
+//                                $("#stackInput").val("");
+//                                $("#stackInput").val(obj.stack);
+//                                $("#DEnvInput").val("");
+//                                $("#DEnvInput").val(obj.DEnv);
+//                            }
+//                        }
                     }
                 },
                 error: function (res) {

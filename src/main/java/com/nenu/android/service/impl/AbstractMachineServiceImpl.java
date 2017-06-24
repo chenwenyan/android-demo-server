@@ -2,14 +2,9 @@ package com.nenu.android.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.nenu.android.service.AbstractMachineService;
-import com.nenu.android.service.IndexService;
-import org.apache.xerces.xs.StringList;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * AbstractMachineServiceImpl
@@ -19,9 +14,6 @@ import java.util.Map;
  */
 @Service("abstractMachineService")
 public class AbstractMachineServiceImpl implements AbstractMachineService{
-
-//    private static String expression = "";
-//    private static String initDEnv = "";
 
     //动态环境 map键值对形式存储
     private static Map<String,Integer> DEnv = new HashMap<String,Integer>();
@@ -35,6 +27,7 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
     private String stack[] = new String[100];
     //标记使用规则
     private String rule = "";
+    private int count = 1;
 
     public JSONObject start(String expression, String initDEnv) throws Exception {
         JSONObject json = new JSONObject();
@@ -52,13 +45,10 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
     public JSONObject next(String controlField,String stackField,String initDEnvField) throws Exception {
         JSONObject json = new JSONObject();
         while(controlSize > 0){
-            System.out.println("进入请求业务逻辑处理");
-            System.out.println("controlSize:" + controlSize);
-            System.out.println("——————————————————————————————————————————————————————————————————————————");
+//            json.put("res",cal());
             json = cal();
         }
         return json;
-
     }
 
     private String initControl(){
@@ -101,11 +91,10 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
 
 
 
-    private JSONObject cal() {
-
+    private  JSONObject cal() {
         //存放结果
         JSONObject jsonObject = new JSONObject();
-
+        List<JSONObject> res = new ArrayList<JSONObject>();
         while (controlSize > 0) {
             String now = control[controlSize - 1];
             controlSize--;
@@ -183,8 +172,10 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
             jsonObject.put("control",controlOut);
             jsonObject.put("stack",stackOut);
             jsonObject.put("DEnv",DEnvOut);
+            System.out.println(jsonObject);
+//            res.set(count, jsonObject);
+            count++;
         }
-
         System.out.println("结束 ");
         return jsonObject;
     }
