@@ -74,17 +74,21 @@
         </div>
     </div>
 
-    <div name="msg" id="msg" class="alert alert-block">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <strong>提示：</strong>
-        <p id="msgDiv" name="msgDiv"></p>
-    </div>
+    <%--<div name="msg" id="msg" class="alert alert-block">--%>
+        <%--<button type="button" class="close" data-dismiss="alert">&times;</button>--%>
+        <%--<strong>提示：</strong>--%>
+        <%--<p id="msgDiv" name="msgDiv"></p>--%>
+    <%--</div>--%>
 
 </div>
 
 <script type="text/javascript">
     $(function () {
+
+        var num = 0;
+
         $("#submitExpression").click(function (e) {
+            num = 0;
             var expression = $("#expressionInput").val().trim();
             var initDenv = $("#initDenvInput").val().trim();
             if (expression == "" || expression == null) {
@@ -93,12 +97,12 @@
                 $.ajax({
                     type: "POST",
                     url: "/start",
+                    async: false,
                     data: {expressionInput: expression, initDenvInput: initDenv},
                     success: function (res) {
-                        console.log(res);
                         if (res.code == 1) {
                             var data = res.data;
-                            $("#ruleInput").val();
+                            $("#ruleInput").val("");
                             $("#controlInput").val("");
                             $("#controlInput").val(data.initControlField);
                             $("#stackInput").val("");
@@ -124,22 +128,25 @@
             $.ajax({
                 type: "POST",
                 url: "/next",
-                data: {control: control, stack: stack, DEnv: DEnv},
+                data: {control: control, stack: stack, DEnv: DEnv,num:num},
                 success: function (res) {
                     console.log(res);
                     if (res.code == 1) {
-                        var item = res.data.data;
-                        for (var i = 0; i < item.length; i++) {
+                        var item = res.data;
+                        if(num < res.steps){
                             $("#ruleInput").val("");
-                            $("#ruleInput").val(item[i]["rule"]);
+                            $("#ruleInput").val(item["rule"]);
                             $("#controlInput").val("");
-                            $("#controlInput").val(item[i]["control"]);
+                            $("#controlInput").val(item["control"]);
                             $("#stackInput").val("");
-                            $("#stackInput").val(item[i]["stack"]);
+                            $("#stackInput").val(item["stack"]);
                             $("#DEnvInput").val("");
-                            $("#DEnvInput").val(item[i]["DEnv"]);
-                            sleep(5000);
+                            $("#DEnvInput").val(item["DEnv"]);
+                            num++;
+                        }else if(num = res.steps){
+                            alert("计算结束！");
                         }
+
                     }
                 },
                 error: function (res) {
@@ -149,11 +156,8 @@
             });
         });
 
-        function sleep(ms) {
-            var starttime = new Date().getTime();
-            do {
+        function setValue(item) {
 
-            } while ((new Date().getTime() - starttime) < ms)
         }
     });
 </script>

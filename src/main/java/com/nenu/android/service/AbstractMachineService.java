@@ -2,6 +2,8 @@ package com.nenu.android.service;
 
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.List;
+
 
 /**
  * AbstractMachineService
@@ -13,6 +15,6 @@ public interface AbstractMachineService {
 
     public JSONObject start(String expression, String initDenv) throws Exception;
 
-    public JSONObject next(String control, String stack, String initDenv) throws Exception;
+    public List<JSONObject> next(String control, String stack, String initDenv) throws Exception;
 
 }

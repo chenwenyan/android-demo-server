@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 
@@ -27,10 +29,7 @@ public class AbstractMachineController {
     @Autowired
     private AbstractMachineService abstractMachineService;
 
-    @RequestMapping(value = "/abstractMachine", method = RequestMethod.GET)
-    public String getExpress(HttpServletRequest request, HttpServletResponse response) {
-        return "abstractMachine";
-    }
+    private List<JSONObject> result = new ArrayList<JSONObject>();
 
     @RequestMapping(value = "/start", method = RequestMethod.POST)
     @ResponseBody
@@ -66,11 +65,19 @@ public class AbstractMachineController {
         String control = request.getParameter("control");
         String stack = request.getParameter("stack");
         String DEnv = request.getParameter("DEnv");
+        int num = Integer.parseInt(request.getParameter("num"));
         String msg = "";
         int code = 1;
         if(isMatch(control)){
             try{
-                jsonObject = abstractMachineService.next(control,stack,DEnv);
+                if(num == 0){
+                    result = abstractMachineService.next(control,stack,DEnv);
+                }
+                if(num == result.size()){
+                    jsonObject = null;
+                }else{
+                    jsonObject = result.get(num);
+                }
                 msg = "解析正确！";
             }catch (Exception e){
                 code = 0;
@@ -82,6 +89,7 @@ public class AbstractMachineController {
         json.put("code",code);
         json.put("data",jsonObject);
         json.put("msg",msg);
+        json.put("steps",result.size());
         return json;
     }
 

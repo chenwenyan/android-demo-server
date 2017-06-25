@@ -18,9 +18,9 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
     //动态环境 map键值对形式存储
     private static Map<String,Integer> DEnv = new HashMap<String,Integer>();
     //初始化控制区操作符或者常量/变量个数
-    private static int controlSize = 0 ;
+    private static int controlSize;
     //初始化栈顶元素
-    private static int stackTop = 0;
+    private static int stackTop;
     //存放解析后的操作符、常量、变量
     private String control[] = new String[100];
     //存放中间变量运算结果
@@ -34,6 +34,11 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
     List<JSONObject> res = new ArrayList<JSONObject>();
 
     public JSONObject start(String expression, String initDEnv) throws Exception {
+
+        stack = new String[100];
+        controlSize = 0 ;
+        stackTop = 0;
+
         JSONObject json = new JSONObject();
         DEnv = init_DEnv(initDEnv);
         control[controlSize++] = expression;
@@ -48,7 +53,7 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
         return json;
     }
 
-    public JSONObject next(String controlField,String stackField,String initDEnvField) throws Exception {
+    public List<JSONObject> next(String controlField,String stackField,String initDEnvField) throws Exception {
         JSONObject json = new JSONObject();
 //        while(controlSize > 0){
 //            json.put("res",cal());
@@ -56,7 +61,7 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
             cal();
             json.put("data",res);
 //        }
-        return json;
+        return res;
     }
 
     private String initControl(){
