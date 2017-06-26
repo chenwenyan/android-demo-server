@@ -36,7 +36,7 @@
             </form>
         </div>
         <div class="panel-footer">
-            <button class="btn btn-default" type="reset">重置</button>
+            <button class="btn btn-default" type="reset" id="resetValue">重置</button>
             <button class="btn btn-primary" name="submitExpression" id="submitExpression">提交</button>
         </div>
     </div>
@@ -156,9 +156,10 @@
             });
         });
 
-        function setValue(item) {
-
-        }
+        $("#resetValue").click(function () {
+            $("#expressionInput").val("");
+            $("#initDenvInput").val("");
+        })
     });
 </script>
 </body>

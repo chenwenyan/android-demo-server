@@ -13,10 +13,10 @@ import java.util.*;
  * Time: 14:16
  */
 @Service("abstractMachineService")
-public class AbstractMachineServiceImpl implements AbstractMachineService{
+public class AbstractMachineServiceImpl implements AbstractMachineService {
 
     //动态环境 map键值对形式存储
-    private static Map<String,Integer> DEnv = new HashMap<String,Integer>();
+    private static Map<String, Integer> DEnv = new HashMap<String, Integer>();
     //初始化控制区操作符或者常量/变量个数
     private static int controlSize;
     //初始化栈顶元素
@@ -27,8 +27,6 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
     private String stack[] = new String[100];
     //标记使用规则
     private String rule = "";
-    private int count = 1;
-    LinkedHashMap<Integer,JSONObject> map = new LinkedHashMap<Integer, JSONObject>();
 
     //存放结果
     List<JSONObject> res = new ArrayList<JSONObject>();
@@ -36,7 +34,7 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
     public JSONObject start(String expression, String initDEnv) throws Exception {
 
         stack = new String[100];
-        controlSize = 0 ;
+        controlSize = 0;
         stackTop = 0;
 
         JSONObject json = new JSONObject();
@@ -44,27 +42,22 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
         control[controlSize++] = expression;
         String initControlField = initControl();
         String initStackField = initStack();
-        String initDEnvFeild = initDEnv();
-        json.put("initControlField",initControlField);
-        json.put("initStackField",initStackField);
-        json.put("initDEnvField",initDEnvFeild);
+        String initDEnvFeild = "[" + initDEnv + "]";
+        json.put("initControlField", initControlField);
+        json.put("initStackField", initStackField);
+        json.put("initDEnvField", initDEnvFeild);
         res.clear();
-        count = 1;
         return json;
     }
 
-    public List<JSONObject> next(String controlField,String stackField,String initDEnvField) throws Exception {
+    public List<JSONObject> next(String controlField, String stackField, String initDEnvField) throws Exception {
         JSONObject json = new JSONObject();
-//        while(controlSize > 0){
-//            json.put("res",cal());
-//            json = cal();
-            cal();
-            json.put("data",res);
-//        }
+        cal();
+        json.put("data", res);
         return res;
     }
 
-    private String initControl(){
+    private String initControl() {
         String controlInitial = "[";
         for (int i = controlSize - 1; i >= 0; i--) {
             controlInitial += control[i];
@@ -73,10 +66,11 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
         }
         controlInitial += "]";
         System.out.println("Control: " + controlInitial);
+        System.out.println(control.toString());
         return controlInitial;
     }
 
-    private String initStack(){
+    private String initStack() {
         String stackInitial = "[";
         for (int i = stackTop - 1; i >= 0; i--) {
             stackInitial += stack[i];
@@ -88,24 +82,23 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
         return stackInitial;
     }
 
-    private String initDEnv(){
-        String DEnvInitial = "[";
-        Boolean flagInitial = false;
-        for (Map.Entry<String, Integer> x : DEnv.entrySet()) {
-            if (flagInitial)
-                DEnvInitial += ", ";
-            flagInitial = true;
-            DEnvInitial += x.getKey() + "->" + String.valueOf(x.getValue());
-        }
-        DEnvInitial += "]";
-        System.out.println("DEnv   :" + DEnvInitial);
-        return DEnvInitial;
-    }
+//    private String initDEnv(){
+//        String DEnvInitial = "[";
+//        Boolean flagInitial = false;
+//        for (Map.Entry<String, Integer> x : DEnv.entrySet()) {
+//            if (flagInitial){
+//                DEnvInitial += ", ";
+//            }
+//            flagInitial = true;
+//            DEnvInitial += x.getKey() + "->" + String.valueOf(x.getValue());
+//        }
+//        DEnvInitial += "]";
+//        System.out.println("DEnv   :" + DEnvInitial);
+//        return DEnvInitial;
+//    }
 
 
-
-    private  void cal() {
-
+    private void cal() {
         while (controlSize > 0) {
             JSONObject jsonObject = new JSONObject();
             String now = control[controlSize - 1];
@@ -180,22 +173,23 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
             DEnvOut += "]";
             System.out.println("DEnv   :" + DEnvOut);
 
-            jsonObject.put("rule",rule);
-            jsonObject.put("control",controlOut);
-            jsonObject.put("stack",stackOut);
-            jsonObject.put("DEnv",DEnvOut);
+            jsonObject.put("rule", rule);
+            jsonObject.put("control", controlOut);
+            jsonObject.put("stack", stackOut);
+            jsonObject.put("DEnv", DEnvOut);
             System.out.println(jsonObject);
-            map.put(count,jsonObject);
             res.add(jsonObject);
-//            res.set(count, jsonObject);
-            count++;
         }
         System.out.println("结束 ");
-        System.out.println(map);
-//        return jsonObject;
     }
 
 
+    /**
+     * 识别变量和常量
+     *
+     * @param now
+     * @return
+     */
     private String getAll(String now) {
         int len = now.length(), i = 0;
         while (i < len && now.charAt(i) != '(')
@@ -206,9 +200,13 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
             ret += now.charAt(i);
             i++;
         }
+        System.out.println(ret);
         return ret;
     }
 
+    /**
+     * 除法法则
+     */
     private void gaoDiv() {
         rule = "除法规则：(n1:n2:vs, div:e, delta) => (n:vs, e, delta), n= n1/n2";
         System.out.println("除法规则：(n1:n2:vs, div:e, delta) => (n:vs, e, delta), n= n1/n2");
@@ -262,6 +260,20 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
             stack[stackTop++] = "false";
     }
 
+    private void Devide(String now) {
+        rule = "分解规则:(vs, op(e1,e2):e, delta) => (vs, e2:e1:op:e, delta)";
+        System.out.println("分解规则:(vs, op(e1,e2):e, delta) => (vs, e2:e1:op:e, delta)");
+        control[controlSize++] = getfirString(now);
+        control[controlSize++] = getPartone(now);
+        control[controlSize++] = getParttwo(now);
+    }
+
+    /**
+     * 操作符
+     *
+     * @param now
+     * @return
+     */
     private String getfirString(String now) {
         int len = now.length(), i = 0;
         char c = now.charAt(i);
@@ -281,59 +293,64 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
         return ret;
     }
 
-    private void Devide(String now) {
-        rule = "分解规则:(vs, op(e1,e2):e, delta) => (vs, e2:e1:op:e, delta)";
-        System.out.println("分解规则:(vs, op(e1,e2):e, delta) => (vs, e2:e1:op:e, delta)");
-        control[controlSize++] = getfirString(now);
-        control[controlSize++] = getPartone(now);
-        control[controlSize++] = getParttwo(now);
-    }
 
+    /**
+     * 表达式e1
+     *
+     * @param now
+     * @return
+     */
     private String getPartone(String now) {
         int len = now.length(), i = 0;
-        while (i < len && now.charAt(i) != '('){
+        while (i < len && now.charAt(i) != '(') {
             i++;
         }
         i++;
         String ret = "";
         int cnt = 0;
-        while (i < len && now.charAt(i) == ' '){
+        while (i < len && now.charAt(i) == ' ') {
             i++;
         }
         while (i < len && (now.charAt(i) != ',' || cnt != 0)) {
             ret += now.charAt(i);
-            if (now.charAt(i) == '('){
+            if (now.charAt(i) == '(') {
                 cnt++;
             }
-            if (now.charAt(i) == ')'){
+            if (now.charAt(i) == ')') {
                 cnt--;
             }
             i++;
         }
-        System.out.println("getPartOne :" + ret );
+        System.out.println("getPartOne :" + ret);
         return ret;
     }
 
+    /**
+     * 表达式e2
+     *
+     * @param now
+     * @return
+     */
     private String getParttwo(String now) {
         int len = now.length(), i = 0;
         while (i < len && now.charAt(i) != '(')
             i++;
         i++;
         int cnt = 0;
-        while (i < len && now.charAt(i) == ' '){
+        while (i < len && now.charAt(i) == ' ') {
             i++;
         }
         while (i < len && (now.charAt(i) != ',' || cnt != 0)) {
-            if (now.charAt(i) == '('){
+            if (now.charAt(i) == '(') {
                 cnt++;
             }
-            if (now.charAt(i) == ')'){
+            if (now.charAt(i) == ')') {
                 cnt--;
             }
             i++;
         }
         i++;
-        while (i < len && now.charAt(i) == ' '){
+        while (i < len && now.charAt(i) == ' ') {
             i++;
         }
         String ret = "";
@@ -341,7 +358,7 @@ public class AbstractMachineServiceImpl implements AbstractMachineService{
             ret += now.charAt(i);
             i++;
         }
-        System.out.println("getPartTwo :" + ret );
+        System.out.println("getPartTwo :" + ret);
         return ret;
     }
 
