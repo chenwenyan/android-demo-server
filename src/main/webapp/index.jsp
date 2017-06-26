@@ -49,20 +49,22 @@
                 <div class="form-group">
                     <div name="rule" id="rule" class="">
                         <label for="controlInput">使用规则：</label>
-                        <div><textarea class="form-control" rows="2" id="ruleInput" name="ruleInput"></textarea></div>
+                        <div><textarea class="form-control" rows="2" id="ruleInput" name="ruleInput" placeholder="转换规则"></textarea></div>
                     </div>
                     <div name="control" id="control" class="">
                         <label for="controlInput">控制区：</label>
-                        <div><textarea class="form-control" rows="2" id="controlInput" name="controlInput"></textarea>
+                        <div><textarea class="form-control" rows="2" id="controlInput" name="controlInput" placeholder="存放待处理的表达式"></textarea>
                         </div>
                     </div>
                     <div name="stack" id="stack" class="">
                         <label for="stackInput">栈：</label>
-                        <div><textarea class="form-control" rows="2" id="stackInput" name="stackInput"></textarea></div>
+                        <div><textarea class="form-control" rows="2" id="stackInput" name="stackInput" placeholder="存放计算的中间值Val*
+"></textarea></div>
                     </div>
                     <div name="DEnv" id="DEnv" class="">
                         <label for="DEnvInput">动态环境：</label>
-                        <div><textarea class="form-control" rows="2" id="DEnvInput" name="DEnvInput"></textarea></div>
+                        <div><textarea class="form-control" rows="2" id="DEnvInput" name="DEnvInput" placeholder="变量状态 IDE -> Val
+"></textarea></div>
                     </div>
                 </div>
 

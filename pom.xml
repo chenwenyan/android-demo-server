@@ -227,6 +227,7 @@
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client</artifactId>
       <version>2.7.3</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/org.apache.mahout/mahout-core -->
@@ -248,6 +249,15 @@
       <artifactId>guava</artifactId>
       <version>21.0</version>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-core -->
+    <dependency>
+      <groupId>org.apache.hadoop</groupId>
+      <artifactId>hadoop-core</artifactId>
+      <version>1.2.1</version>
+    </dependency>
+
+
 
   </dependencies>
 

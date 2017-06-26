@@ -177,7 +177,6 @@ public class AbstractMachineServiceImpl implements AbstractMachineService {
             jsonObject.put("control", controlOut);
             jsonObject.put("stack", stackOut);
             jsonObject.put("DEnv", DEnvOut);
-            System.out.println(jsonObject);
             res.add(jsonObject);
         }
         System.out.println("结束 ");
