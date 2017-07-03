@@ -214,6 +214,10 @@ public class AbstractMachineServiceImpl implements AbstractMachineService {
         stack[stackTop++] = String.valueOf(a / b);
     }
 
+    /**
+     * 乘法法则
+     *
+     */
     private void gaoMul() {
         rule = "乘法规则：(n1:n2:vs, mul:e, delta) => (n:vs, e, delta), n= n1*n2";
         System.out.println("乘法规则：(n1:n2:vs, mul:e, delta) => (n:vs, e, delta), n= n1*n2");
@@ -222,6 +226,10 @@ public class AbstractMachineServiceImpl implements AbstractMachineService {
         stack[stackTop++] = String.valueOf(a * b);
     }
 
+    /**
+     * 减法法则
+     *
+     */
     private void gaoSub() {
         rule = "减法规则：(n1:n2:vs, sub:e, delta) => (n:vs, e, delta), n= n1-n2";
         System.out.println("减法规则：(n1:n2:vs, sub:e, delta) => (n:vs, e, delta), n= n1-n2");
@@ -230,13 +238,22 @@ public class AbstractMachineServiceImpl implements AbstractMachineService {
         stack[stackTop++] = String.valueOf(a - b);
     }
 
+    /**
+     * 加法法则
+     *
+     */
     private void gaoAdd() {
+        rule = "加法规则：(n1:n2:vs, add:e, delta) => (n:vs, e, delta), n= n1+n2";
         System.out.println("加法规则：(n1:n2:vs, add:e, delta) => (n:vs, e, delta), n= n1+n2");
         int a = Integer.valueOf(stack[--stackTop]);
         int b = Integer.valueOf(stack[--stackTop]);
         stack[stackTop++] = String.valueOf(a + b);
     }
 
+    /**
+     * 比较法则：小于等于
+     *
+     */
     private void gaoSe() {
         rule = "比较规则：(n1:n2:vs, se:e, delta) => (n:vs, e, delta), n = (n1<=n2)";
         System.out.println("比较规则：(n1:n2:vs, se:e, delta) => (n:vs, e, delta), n = (n1<=n2)");
@@ -248,6 +265,10 @@ public class AbstractMachineServiceImpl implements AbstractMachineService {
             stack[stackTop++] = "false";
     }
 
+    /**
+     * 比较法则：大于等于
+     *
+     */
     private void gaoGe() {
         rule = "比较规则：(n1:n2:vs, ge:e, delta) => (n:vs, e, delta), n = (n1>=n2)";
         System.out.println("比较规则：(n1:n2:vs, ge:e, delta) => (n:vs, e, delta), n = (n1>=n2)");
@@ -259,6 +280,11 @@ public class AbstractMachineServiceImpl implements AbstractMachineService {
             stack[stackTop++] = "false";
     }
 
+    /**
+     * 分解规则
+     *
+     * @param now
+     */
     private void Devide(String now) {
         rule = "分解规则:(vs, op(e1,e2):e, delta) => (vs, e2:e1:op:e, delta)";
         System.out.println("分解规则:(vs, op(e1,e2):e, delta) => (vs, e2:e1:op:e, delta)");

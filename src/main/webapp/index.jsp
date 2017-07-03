@@ -17,7 +17,7 @@
 <div style="width:50%;margin-left:25%">
     <div class="panel panel-primary">
         <div class="panel-heading">
-            <h3 class="panel-title">语言Le的抽象机状态转换动态演示</h3>
+            <h3 class="panel-title text-center">语言Le的抽象机状态转换动态演示</h3>
         </div>
         <div class="panel-body">
             <form name="expressionForm" id="expressionForm" role="form">
@@ -42,7 +42,7 @@
     </div>
     <div class="panel panel-success">
         <div class="panel-heading">
-            <h3 class="panel-title">结果</h3>
+            <h3 class="panel-title ">结果</h3>
         </div>
         <div class="panel-body">
             <form name="comForm" id="comForm" role="form">
